@@ -16,16 +16,26 @@ std::chrono::high_resolution_clock::duration measure(std::function<void()> f, in
 	return (end - begin) / n;
 }
 
-
-void c_style_sort(int *m, int n) 
+template<typename C>
+void sort_gen(C& m, int n)
 {
-	for (int i = 0; i < N - 1; i++)
-		for (int j = i + 1; j < N; j++) {
+	for (int i = 0; i < n - 1; i++)
+		for (int j = i + 1; j < n; j++) {
 			if (m[i] < m[j])
 			{
-				int tmp = m[i];
-				m[i] = m[j];
-				m[j] = tmp;
+				std::swap(m[i], m[j]);
+			}
+		}
+}
+
+template<>
+void sort_gen(std::vector<int>& m, int n)
+{
+	for (int i = 0; i < n - 1; i++)
+		for (int j = i + 1; j < n; j++) {
+			if (m.at(i) < m.at(j))
+			{
+				std::swap(m[i], m[j]);
 			}
 		}
 }
@@ -38,23 +48,10 @@ void c_style_test()
 	{
 		m[i] = i;
 	}
-	c_style_sort(m, N);
+	sort_gen(m, N);
 	delete[] m;
 }
 
-void cpp_style_sort(std::array<int, N> &m)
-{
-	auto n = m.size();
-	for (int i = 0; i < n-1; i++)
-		for (int j = i + 1; j < n; j++) {
-			if (m[i] < m[j])
-			{
-				int tmp = m[i];
-				m[i] = m[j];
-				m[j] = tmp;
-			}
-		}
-}
 
 void cpp_style_test()
 {
@@ -64,23 +61,10 @@ void cpp_style_test()
 	{
 		m[i] = i; 
 	}
-	cpp_style_sort(m);
+	sort_gen(m, m.size());
+
 }
 
-void vector_sort(std::vector<int> &m)
-{
-	auto n = m.size();
-
-	for (int i = 0; i < n - 1; i++)
-		for (int j = i + 1; j < n; j++) {
-			if (m[i] < m[j])
-			{
-				int tmp = m[i];
-				m[i] = m[j];
-				m[j] = tmp;
-			}
-		}
-}
 
 void vector_test()
 {
@@ -91,7 +75,7 @@ void vector_test()
 	{
 		m.push_back(i);
 	}
-	vector_sort(m);
+	sort_gen(m, m.size());
 }
 
 int main()
